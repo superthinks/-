@@ -1,0 +1,46 @@
+#include <LiquidCrystal_I2C.h> //라이브러리 추가
+LiquidCrystal_I2C lcd(0x27, 16, 2); //주석 뇌피셜로 시부린거
+
+int trig = 8; //초음파 센서 trig 핀 
+int echo = 9; //초음판 센서 echo 핀
+
+
+void setup() { //업로드시 1회 실행되는것
+  lcd.begin(); //lcd 사용 시작
+  Serial.begin(9600); //시리얼통신? 
+  pinMode(trig, OUTPUT); //trig핀을 출력으로 설정함
+  pinMode(echo, INPUT); //echo핀을 입력으로 설정함
+
+}
+
+void loop() { //반복문
+  digitalWrite(trig,LOW); //trig에 0v
+  digitalWrite(echo,LOW); //echo에 0v
+  delayMicroseconds(2); //2마이크로초 대기
+  digitalWrite(trig, HIGH); //trig에 5v
+  delayMicroseconds(10); //2마이크로초 대기
+  digitalWrite(trig,LOW); //trig에 0v
+
+  unsigned long duration = pulseIn(echo, HIGH); //0 ~ 43억까지 받는 duration 값 정의(echo핀에 5v인가)
+  float distance = duration/29.0 /2.0; //실수형으로 distance 정의 (주파수 cm로 변환 하기 위함)
+  Serial.print(distance); //ide내에서 확인할 수 있는 시리얼모니터로 distance출력
+  
+  lcd.setCursor(5,0); //lcd커서 5,0부터 시작
+  lcd.print(distance,2); //distance를 소수점 2번째 자리까지 출력
+  lcd.setCursor(9,0); //lcd 9,0부터 시작
+  lcd.print("cm"); //"cm" 출력
+delay(1);
+
+  if (distance > 100) { //distance가 100 이상(너무 가까이 대거나 멀경우 100 이상 값 출력,자리수를 일정하게 맞추기 위해)일경우
+   lcd.setCursor(5,0);
+   lcd.print("error"); //error 출력
+   lcd.setCursor(10.,0);
+   lcd.print("...");
+
+
+  }
+delay(1);
+
+ 
+
+}
